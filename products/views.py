@@ -1,8 +1,19 @@
 from django.http import HttpResponse
 from django.shortcuts import render
+from products.models import Product, ProductCategory
+
 
 def index(request):
-    return render(request, 'products/index.html')
+    context = {
+        'title': 'Test Title',
+        'is_promotion': False
+    }
+    return render(request, 'products/index.html', context)
 
 def products(request):
-    return render(request, 'products/products.html')
+    context = {
+        'title' : 'Store - Каталог',
+        'products': Product.objects.all(),
+        'categories': ProductCategory.objects.all(),
+    }
+    return render(request, 'products/products.html', context)
