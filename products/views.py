@@ -2,8 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from products.models import Product, ProductCategory, Basket
-from users.models import User
-from users.views import login
+from django.core.paginator import Paginator
 
 
 def index(request):
@@ -14,15 +13,27 @@ def index(request):
     return render(request, 'products/index.html', context)
 
 def products(request, category_id=None):
-    products = Product.objects.filter(category_id=category_id) if category_id else Product.objects.all()
+    PER_PAGE = 1
+    if category_id:
+        category = ProductCategory.objects.get(id=category_id)
+        products = Product.objects.filter(category=category)
+    else:
+        products = Product.objects.all()
+    page = request.GET.get('page', 1)
+    if not isinstance(page, int):
+        if page.isdigit():
+            page = int(page)
+        else:
+            page = 1
+    paginator = Paginator(products, per_page=PER_PAGE)
+    page_products = paginator.page(page)
+    return render(request, 'products/products.html', context={
+        'title': 'Store - продукты',
+        'products': page_products,
+        'category': ProductCategory.objects.all(),
+        'category_id': category_id
+    })
 
-    context = {
-        'title' : 'Store - Каталог',
-        'products': products,
-        'categories': ProductCategory.objects.all(),
-    }
-
-    return render(request, 'products/products.html', context)
 
 @login_required
 def basket_add(request, product_id):
