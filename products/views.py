@@ -1,14 +1,16 @@
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.views.generic import TemplateView
 from django.views.generic.list import ListView
-from products.models import Product, ProductCategory, Basket
+
 from common.views import TitleMixin
+from products.models import Basket, Product, ProductCategory
 
 
 class IndexView(TemplateView, TitleMixin):
     template_name = 'products/index.html'
     title = 'Store'
+
 
 class ProductsListView(ListView, TitleMixin):
     model = Product
@@ -26,6 +28,7 @@ class ProductsListView(ListView, TitleMixin):
         context['categories'] = ProductCategory.objects.all()
         return context
 
+
 @login_required
 def basket_add(request, product_id):
     product = Product.objects.get(id=product_id)
@@ -37,14 +40,11 @@ def basket_add(request, product_id):
         basket = baskets.first()
         basket.quantity += 1
         basket.save()
-
-
     return HttpResponseRedirect(request.META.get('HTTP_REFERER', ''))
+
 
 @login_required()
 def basket_remove(request, basket_id):
     basket = Basket.objects.get(id=basket_id)
     basket.delete()
     return HttpResponseRedirect(request.META['HTTP_REFERER'])
-
-

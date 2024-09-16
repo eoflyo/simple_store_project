@@ -1,11 +1,14 @@
+from datetime import timedelta
+from http import HTTPStatus
+
 from allauth.account.views import email
 from django.test import TestCase
 from django.urls import reverse
-from datetime import timedelta
-from http import HTTPStatus
 from django.utils.timezone import now
-from users.models import User, EmailVerification
+
 from store.wsgi import *
+from users.models import EmailVerification, User
+
 
 class UserRegistrationViewTestCase(TestCase):
 
